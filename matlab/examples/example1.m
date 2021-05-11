@@ -1,17 +1,17 @@
 
+path2fracridge = '/Users/jk7127/Documents/fracridge';
+addpath(genpath(path2fracridge));
+addpath(genpath('./../'))
+
 if ~exist('./data','dir')
     mkdir('data')
     % Download TDM data for an example subject
     
-    !curl -L --output ./data/information.mat https://osf.io/9k76x/download
-    !curl -L --output ./data/run1.mat https://osf.io/gvfwp/7jdzx/download
-    !curl -L --output ./data/run2.mat https://osf.io/cruy6/download
-    !curl -L --output ./data/run3.mat https://osf.io/9ntq2/download
-    !curl -L --output ./data/run4.mat https://osf.io/urtp5/download
-    !curl -L --output ./data/lh_rois.mat https://osf.io/bxugz/download
-    !curl -L --output ./data/rh_rois.mat https://osf.io/bzjd6/download
-
-
+    !curl -L --output ./data/information.mat https://osf.io/7hpr4/download
+    !curl -L --output ./data/run1.mat https://osf.io/7jdzx/download
+    !curl -L --output ./data/run2.mat https://osf.io/dhx3u/download
+    !curl -L --output ./data/run3.mat https://osf.io/nrqz6/download
+    !curl -L --output ./data/run4.mat https://osf.io/nwf28/download
     
 end
 
@@ -32,7 +32,7 @@ clc
 disp(data)
 fprintf('data consists of 4 runs, 870401 surface vertices, 6 cortical depths and 368 TRs for one example subject.\n\n')
 disp(design(1:2)')
-fprintf('Each run has a corresponding design matrix with TRs*conditions\n\n')
+fprintf('Each run has a corresponding design matrix (TRs*conditions) with 6 different conditions \n\n')
 
 figure(1);clf
 subplot(2,2,1); imagesc(design{1}); colormap gray
@@ -52,14 +52,15 @@ xlabel('Conditions')
 ylabel('TRs')
 title('Design matrix for run4')
 
+%%
 %We are going to split the data in segments of two runs. First analysis is
 %going to be performed on run1 and run2 while the second analysis is going
 %to be performed on run3 and run4. We do that to asses the reproduciblity
-%of beta weights derived from GLM single. To speed up the estimaton we
+%of beta weights (run1+run2 vs. run3+run4) derived from GLM single. To speed up the estimaton we
 %select data only from superficial layer and left V1.
 
-lh_roi = MRIread('./data/lhDENSETRUNCpt.Kastner2015Labels.mgz');
-V1_lh_ind = lh_roi.vol == 1;
+load('./rois/lh_rois.mat');
+V1_lh_ind = (lh_rois == 1 | lh_rois == 2); % dorsalV1 = 1 and ventralV1 = 2;
 
 % create superficial dataset
 superficial_data = cell(1,length(numrun)/2);
@@ -72,18 +73,18 @@ for r = 1 : 2
     
 end
 %%
-% First, we run the GLM with canonical HRF only
-opt.wantmemoryoutputs = [0 1 0 0]; % keep results in matlab memory for A, B, C, D
+% First, we run the GLM with canonical HRF only for run1+run2
+opt.wantmemoryoutputs = [0 1 0 0]; % keep results in matlab memory 
 opt.hrftoassume = 1;
 opt.wantlibrary = 0;
 opt.wantglmdenoise = 0;
 opt.wantfracridge = 0;
-% run GLMsingle on first two runs
 outputidr = 'assume_HRF_test';
-[assume_test] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
+[assume_HRF_test] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
 
 %%
-% Now we enhance the model and include fitted HRF, GLM denoise and Ridge regression
+% Now we enhance the model and include fitted HRF, GLM denoise and Ridge
+% regression for run1+run2
 opt.hrftoassume = 1; % fit HRF
 opt.wantlibrary = 1; % output B performs GLM with fitted HRF
 opt.wantglmdenoise = 1; % output C adds GLMDenoise
@@ -93,8 +94,8 @@ opt.wantfileoutputs = [0 0 0 0]; % save results for output A, B, C, D
 opt.wantmemoryoutputs = [0 1 1 1]; % keep results in matlab memory for A, B, C, D
 
 % run GLMsingle on first two runs
-outputidr = 'superficial_GLM_figures_test';
-[results_test] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
+outputidr = 'fit_HRF_test';
+[fit_HRF_test] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
 
 %%
 % for reproducibiliy we now run GLM on data from run3 and run4, first
@@ -122,7 +123,7 @@ opt.wantfracridge = 0;
 % We run the GLM with canonical HRF only for run3 and run4
 % run GLMsingle on first two runs
 outputidr = 'assume_HRF_retest';
-[assume_retest] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
+[assume_HRF_retest] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
 
 %% We enhance the model to include fitted HRF, GLM denose and Ridge regression for run3 and run4
 opt.hrftoassume = 1;
@@ -132,8 +133,8 @@ opt.wantfracridge = 1; % output D adds Ridge regression
 
 opt.wantfileoutputs = [0 0 0 0]; % save results for output A, B, C, D
 opt.wantmemoryoutputs = [0 1 1 1]; % keep results in matlab memory for A, B, C, D
-outputidr = 'superficial_GLM_figures_retest';
-[results_retest] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
+outputidr = 'fit_HRF_retest';
+[fit_HRF_retest] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
 
 
 %% Make voxel-vise correlation of beta weights for each approach (A,B,C,D)
