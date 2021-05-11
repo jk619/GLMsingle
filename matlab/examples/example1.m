@@ -138,7 +138,7 @@ outputidr = 'fit_HRF_retest';
 
 %% Make voxel-vise correlation of beta weights for each approach (A,B,C,D)
 
-approach = {'canonicalHRF';'fittedHRF';'GLMdenoise';'RR'}
+approach = {'canonicalHRF';'fittedHRF';'GLMdenoise';'RR'};
 
 figure(2);clf
 for a = 1 : 4
