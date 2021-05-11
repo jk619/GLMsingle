@@ -115,17 +115,16 @@ end
 
 
 %%
+% We run the GLM with canonical HRF only for run3 + run4
 opt.wantmemoryoutputs = [0 1 0 0]; % keep results in matlab memory for A, B, C, D
 opt.hrftoassume = 1;
 opt.wantlibrary = 0;
 opt.wantglmdenoise = 0;
 opt.wantfracridge = 0;
-% We run the GLM with canonical HRF only for run3 and run4
-% run GLMsingle on first two runs
 outputidr = 'assume_HRF_retest';
 [assume_HRF_retest] = GLMestimatesingletrial(superficial_design,superficial_data,stimdur,tr,outputidr,opt);
 
-%% We enhance the model to include fitted HRF, GLM denose and Ridge regression for run3 and run4
+%% We enhance the model to include fitted HRF, GLM denose and Ridge regression for run3 + run4
 opt.hrftoassume = 1;
 opt.wantlibrary = 1; % output B adds HRF fitting per voxel
 opt.wantglmdenoise = 1; % output C adds GLMDenoie
