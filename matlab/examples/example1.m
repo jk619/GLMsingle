@@ -85,13 +85,13 @@ outputidr = 'assume_HRF_test';
 %%
 % Now we enhance the model and include fitted HRF, GLM denoise and Ridge
 % regression for run1+run2
-opt.hrftoassume = 1; % fit HRF
-opt.wantlibrary = 1; % output B performs GLM with fitted HRF
+opt.hrftoassume = 1; % get canonical hrf
+opt.wantlibrary = 1; % create familly of HRFs output B
 opt.wantglmdenoise = 1; % output C adds GLMDenoise
 opt.wantfracridge = 1; % output D adds Ridge regression
 
 opt.wantfileoutputs = [0 0 0 0]; % save results for output A, B, C, D
-opt.wantmemoryoutputs = [0 1 1 1]; % keep results in matlab memory for A, B, C, D
+opt.wantmemoryoutputs = [0 1 1 1]; % keep results in matlab memory for A, B, C, D (note - We don't use output A as it's only ON/OFF GLM)
 
 % run GLMsingle on first two runs
 outputidr = 'fit_HRF_test';
@@ -147,12 +147,12 @@ for a = 1 : 4
     subplot(2,2,a)
     
     if a == 1
-    plot(assume_test{2}.modelmd(:),assume_retest{2}.modelmd(:),'.')
-    R = corr(assume_test{2}.modelmd(:),assume_retest{2}.modelmd(:));
+    plot(assume_HRF_test{2}.modelmd(:),assume_HRF_retest{2}.modelmd(:),'.')
+    R = corr(assume_HRF_test{2}.modelmd(:),assume_HRF_retest{2}.modelmd(:));
 
     else
-        plot(results_test{a}.modelmd(:),results_retest{a}.modelmd(:),'.')
-        R = corr(results_test{a}.modelmd(:),results_retest{a}.modelmd(:));
+        plot(fit_HRF_test{a}.modelmd(:),fit_HRF_retest{a}.modelmd(:),'.')
+        R = corr(fit_HRF_test{a}.modelmd(:),fit_HRF_retest{a}.modelmd(:));
 
     end
     xlabel('Beta test')
