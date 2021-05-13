@@ -1,0 +1,443 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>example_1</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-05-13"><meta name="DC.source" content="example_1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#1">Add dependencies and download the data</a></li><li><a href="#5">Call GLMestimatesingletrial using default parameters</a></li><li><a href="#6">Important outputs</a></li><li><a href="#7">Plot 1 slice of brain data</a></li><li><a href="#8">Plot single beta weights for one voxel for all conditions</a></li></ul></div><h2 id="1">Add dependencies and download the data</h2><p>addpath to GLMsingle and fracridge</p><pre class="codeinput">addpath(genpath(<span class="string">'./../'</span>))
+addpath(genpath(<span class="string">'/Users/jk7127/Documents/fracridge'</span>))
+
+clear
+
+<span class="comment">% Pick dataset</span>
+
+datasets = {<span class="string">'nsdcore'</span>;<span class="string">'nsdfloc'</span>;<span class="string">'haxby'</span>};
+dataset = datasets{2};
+
+<span class="comment">% Download data to data directory</span>
+
+<span class="keyword">if</span> ~exist(<span class="string">'./data'</span>,<span class="string">'dir'</span>)
+    mkdir(<span class="string">'data'</span>)
+
+<span class="keyword">end</span>
+
+
+<span class="keyword">switch</span> dataset
+
+    <span class="keyword">case</span> <span class="string">'nsdfloc'</span>
+
+        <span class="keyword">if</span> ~exist(<span class="string">'./data/nsdflocexampledataset.mat'</span>,<span class="string">'file'</span>)
+            <span class="syscmd">!curl -L --output ./data/nsdflocexampledataset.mat https://osf.io/8rmjk/download</span>
+        <span class="keyword">end</span>
+        load(<span class="string">'./data/nsdflocexampledataset.mat'</span>)
+
+    <span class="keyword">case</span> <span class="string">'nsdcore'</span>
+
+        <span class="keyword">if</span> ~exist(<span class="string">'./data/nsdcoreexampledataset.mat'</span>,<span class="string">'file'</span>)
+            <span class="syscmd">!curl -L --output ./data/nsdcoreexampledataset.mat https://osf.io/jqpwz/download</span>
+        <span class="keyword">end</span>
+        load(<span class="string">'./data/nsdcoreexampledataset.mat'</span>)
+
+    <span class="keyword">case</span> <span class="string">'haxby'</span>
+
+        <span class="keyword">if</span> ~exist(<span class="string">'./data/haxby.mat'</span>,<span class="string">'file'</span>)
+            <span class="syscmd">!curl -L --output ./data/haxby.mat https://osf.io/f6vpq/download</span>
+        <span class="keyword">end</span>
+        load(<span class="string">'./data/haxby.mat'</span>)
+<span class="keyword">end</span>
+</pre><pre class="codeinput">clc
+whos
+<span class="comment">% data -&gt; Consists of several runs of 4D volume files (x y z t)  where</span>
+<span class="comment">% (t)ime is the 4th dimention</span>
+
+<span class="comment">% design -&gt; Each run has a corresponding design matrix where each colum</span>
+<span class="comment">% describes single condition (conditions are repeated across runs). Each</span>
+<span class="comment">% design matrix is binary with 1 specfing the time (TR) when stimulus is</span>
+<span class="comment">% presented on the screen.</span>
+
+
+fprintf(<span class="string">'There are %d runs in total.\n'</span>,length(design));
+fprintf(<span class="string">'The dimensions of the data for the first run are %s.\n'</span>,mat2str(size(data{1})));
+fprintf(<span class="string">'The stimulus duration is %.6f seconds.\n'</span>,stimdur);
+fprintf(<span class="string">'The sampling rate (TR) is %.6f seconds.\n'</span>,tr);
+</pre><pre class="codeoutput">  Name          Size                Bytes  Class     Attributes
+
+  data          1x4             662329024  cell                
+  dataset       1x7                    14  char                
+  datasets      3x1                   374  cell                
+  design        1x4                  4640  cell                
+  stimdur       1x1                     8  double              
+  tr            1x1                     8  double              
+
+There are 4 runs in total.
+The dimensions of the data for the first run are [52 81 42 234].
+The stimulus duration is 4.000000 seconds.
+The sampling rate (TR) is 1.333333 seconds.
+</pre><pre class="codeinput">figure(1);clf
+
+<span class="keyword">for</span> d = 1 : 4
+    subplot(2,2,d); imagesc(design{d}); colormap <span class="string">gray</span>; drawnow
+    xlabel(<span class="string">'Conditions'</span>)
+    ylabel(<span class="string">'TRs'</span>)
+    title(sprintf(<span class="string">'Design matrix for run%i'</span>,d))
+    set(gca,<span class="string">'YDir'</span>,<span class="string">'normal'</span>)
+
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="example_1_01.png" alt=""> <pre class="codeinput">figure(2);clf
+
+imagesc(makeimagestack(data{1}(:,:,:,1)));
+colormap(gray);
+axis <span class="string">equal</span> <span class="string">tight</span>;
+colorbar;
+title(<span class="string">'fMRI data (first volume)'</span>);
+</pre><img vspace="5" hspace="5" src="example_1_02.png" alt=""> <h2 id="5">Call GLMestimatesingletrial using default parameters</h2><p>Outputs and figures will be stored in folder with experiment name in the current directory or saved to the results variable which is the only output of GLMestimatesingletrial</p><pre class="codeinput"><span class="comment">% Optional parameters below can be assigned to a variable i.e</span>
+<span class="comment">% opt by creating fields (i.e opt.wantlibrary). Options are the 6th input</span>
+<span class="comment">% to GLMestimatesingletrial.</span>
+
+<span class="comment">% DEFAULT OPTIONS:</span>
+
+<span class="comment">% wantlibrary = 1 -&gt; Fit hRF to each voxel</span>
+<span class="comment">% wantglmdenoise = 1 -&gt; Use GLMdenoise</span>
+<span class="comment">% wantfracridge = 1  -&gt; Use ridge regression to improve beta estimates</span>
+<span class="comment">% chunknum = 5000 -&gt; is the number of voxels that we will process at the</span>
+<span class="comment">% same time. For setups with lower memory deacrease this number.</span>
+
+<span class="comment">% wantmemoryoutputs is a logical vector [A B C D] indicating which of the</span>
+<span class="comment">%     four model types to return in the output &lt;results&gt;. The user must be careful with this,</span>
+<span class="comment">%     as large datasets can require a lot of RAM. If you do not request the various model types,</span>
+<span class="comment">%     they will be cleared from memory (but still potentially saved to disk).</span>
+<span class="comment">%     Default: [0 0 0 1] which means return only the final type-D model.</span>
+
+<span class="comment">% wantfileoutputs is a logical vector [A B C D] indicating which of the</span>
+<span class="comment">%     four model types to save to disk (assuming that they are computed).</span>
+<span class="comment">%     A = 0/1 for saving the results of the ONOFF model</span>
+<span class="comment">%     B = 0/1 for saving the results of the FITHRF model</span>
+<span class="comment">%     C = 0/1 for saving the results of the FITHRF_GLMDENOISE model</span>
+<span class="comment">%     D = 0/1 for saving the results of the FITHRF_GLMDENOISE_RR model</span>
+<span class="comment">%     Default: [1 1 1 1] which means save all computed results to disk.</span>
+
+
+[results] = GLMestimatesingletrial(design,data,stimdur,tr,dataset);
+</pre><pre class="codeoutput">Warning: Removed '/Users/jk7127/Documents/GLMsingle/matlab/examples/nsdfloc'
+from the MATLAB path for this MATLAB session.
+	See 'doc path' for more information. 
+*** FITTING TYPE-A MODEL (ONOFF) ***
+*** Saving results to nsdfloc/TYPEA_ONOFF.mat. ***
+*** FITTING TYPE-B MODEL (FITHRF) ***
+working on chunk 1 of 4.
+working on chunk 2 of 4.
+working on chunk 3 of 4.
+working on chunk 4 of 4.
+*** Saving results to nsdfloc/TYPEB_FITHRF.mat. ***
+*** DETERMINING GLMDENOISE REGRESSORS ***
+*** CROSS-VALIDATING DIFFERENT NUMBERS OF REGRESSORS ***
+working on chunk 1 of 4.
+working on chunk 2 of 4.
+working on chunk 3 of 4.
+working on chunk 4 of 4.
+*** FITTING TYPE-C MODEL (GLMDENOISE) ***
+working on chunk 1 of 4.
+working on chunk 2 of 4.
+working on chunk 3 of 4.
+working on chunk 4 of 4.
+*** FITTING TYPE-D MODEL (GLMDENOISE_RR) ***
+working on chunk 1 of 4.
+working on chunk 2 of 4.
+working on chunk 3 of 4.
+working on chunk 4 of 4.
+</pre><img vspace="5" hspace="5" src="example_1_03.png" alt=""> <h2 id="6">Important outputs</h2><p><a href="R2">R2</a> is model accuracy expressed in terms of R^2 (percentage). <a href="modelmd">modelmd</a> is the full set of single-trial beta weights (X x Y x Z x TRIALS) <a href="HRFindex">HRFindex</a> is the 1-index of the best HRF, can be retried with getcanonicalhrflibrary(stimdur,tr) <a href="FRACvalue">FRACvalue</a> is the fractional ridge regression regularization level chosen for each voxel</p><h2 id="7">Plot 1 slice of brain data</h2><pre class="codeinput">slice = 20; <span class="comment">% adjust this number when using different datasets</span>
+val2plot = {<span class="string">'meanvol'</span>;<span class="string">'R2'</span>;<span class="string">'HRFindex'</span>;<span class="string">'FRACvalue'</span>};
+cmaps = {gray;hot;parula;copper};
+figure(3);clf
+
+<span class="keyword">for</span> v = 1 : length(val2plot)
+
+    f=subplot(2,2,v);
+    imagesc(results{4}.(val2plot{v})(:,:,slice)); axis <span class="string">off</span> <span class="string">image</span>;
+    colormap(f,cmaps{v}) <span class="comment">% Error message is related to this line</span>
+    colorbar
+    title(val2plot{v})
+    set(gca,<span class="string">'FontSize'</span>,20)
+
+<span class="keyword">end</span>
+
+set(gcf,<span class="string">'Position'</span>,[1224 840 758 408])
+</pre><img vspace="5" hspace="5" src="example_1_04.png" alt=""> <h2 id="8">Plot single beta weights for one voxel for all conditions</h2><pre class="codeinput">betas = results{4}.modelmd;
+<span class="comment">% locate beta weights for the same condition in beta output.</span>
+newdesign = design;
+<span class="keyword">for</span> r = 1 : length(design)
+
+    dm = full(design{r});
+    newdm = zeros(size(dm));
+    <span class="keyword">for</span> cond = 1 : size(dm,2)
+
+        tmp = dm(:,cond) == 1;
+        newdm(tmp,cond) = cond;
+        newdesign{r} = newdm;
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+indx_of_beta=cell2mat(cellfun(@flatten,newdesign,<span class="string">'UniformOutput'</span>,false));
+indx_of_beta(indx_of_beta==0) = [];
+<span class="comment">% index_of_beta should correspond to the 4th dimension of betas</span>
+[maxval,ind] = max(results{4}.R2(:));
+[x,y,z] = ind2sub(size(results{4}.R2),ind);
+
+figure(4);clf
+<span class="keyword">for</span> i = unique(indx_of_beta)
+
+    beta_ind = indx_of_beta == i;
+    plot(ones(sum(beta_ind),1)*i,squeeze(betas(x,y,z,beta_ind)),<span class="string">'.'</span>,<span class="string">'MarkerSize'</span>,10); hold <span class="string">on</span>
+    bar(i,nanmedian(squeeze(betas(x,y,z,beta_ind))),<span class="string">'FaceColor'</span>,<span class="string">'None'</span>);
+
+<span class="keyword">end</span>
+
+xticks(1:length(unique(indx_of_beta)))
+
+ylabel(<span class="string">'Single trial beta weight'</span>)
+xlabel(<span class="string">'Conditions'</span>)
+title(<span class="string">'Single beta weights for each condition for voxel with highest R2'</span>)
+set(gca,<span class="string">'Fontsize'</span>,15)
+</pre><img vspace="5" hspace="5" src="example_1_05.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Add dependencies and download the data
+% addpath to GLMsingle and fracridge
+addpath(genpath('./../'))
+addpath(genpath('/Users/jk7127/Documents/fracridge'))
+
+clear
+
+% Pick dataset
+
+datasets = {'nsdcore';'nsdfloc';'haxby'};
+dataset = datasets{2};
+
+% Download data to data directory
+
+if ~exist('./data','dir')
+    mkdir('data')
+    
+end
+
+
+switch dataset
+    
+    case 'nsdfloc'
+        
+        if ~exist('./data/nsdflocexampledataset.mat','file')
+            !curl -L REPLACE_WITH_DASH_DASHoutput ./data/nsdflocexampledataset.mat https://osf.io/8rmjk/download
+        end
+        load('./data/nsdflocexampledataset.mat')
+        
+    case 'nsdcore'
+        
+        if ~exist('./data/nsdcoreexampledataset.mat','file')
+            !curl -L REPLACE_WITH_DASH_DASHoutput ./data/nsdcoreexampledataset.mat https://osf.io/jqpwz/download
+        end
+        load('./data/nsdcoreexampledataset.mat')
+        
+    case 'haxby'
+        
+        if ~exist('./data/haxby.mat','file')
+            !curl -L REPLACE_WITH_DASH_DASHoutput ./data/haxby.mat https://osf.io/f6vpq/download
+        end
+        load('./data/haxby.mat')
+end
+
+%%
+clc
+whos
+% data -> Consists of several runs of 4D volume files (x y z t)  where
+% (t)ime is the 4th dimention
+
+% design -> Each run has a corresponding design matrix where each colum
+% describes single condition (conditions are repeated across runs). Each
+% design matrix is binary with 1 specfing the time (TR) when stimulus is
+% presented on the screen.
+
+
+fprintf('There are %d runs in total.\n',length(design));
+fprintf('The dimensions of the data for the first run are %s.\n',mat2str(size(data{1})));
+fprintf('The stimulus duration is %.6f seconds.\n',stimdur);
+fprintf('The sampling rate (TR) is %.6f seconds.\n',tr);
+
+%%
+figure(1);clf
+
+for d = 1 : 4
+    subplot(2,2,d); imagesc(design{d}); colormap gray; drawnow
+    xlabel('Conditions')
+    ylabel('TRs')
+    title(sprintf('Design matrix for run%i',d))
+    set(gca,'YDir','normal')
+    
+end
+%%
+figure(2);clf
+
+imagesc(makeimagestack(data{1}(:,:,:,1)));
+colormap(gray);
+axis equal tight;
+colorbar;
+title('fMRI data (first volume)');
+%% Call GLMestimatesingletrial using default parameters
+% Outputs and figures will be stored in folder with experiment name in the
+% current directory or saved to the results variable which is the only
+% output of GLMestimatesingletrial
+
+% Optional parameters below can be assigned to a variable i.e
+% opt by creating fields (i.e opt.wantlibrary). Options are the 6th input 
+% to GLMestimatesingletrial.
+
+% DEFAULT OPTIONS:
+
+% wantlibrary = 1 -> Fit hRF to each voxel
+% wantglmdenoise = 1 -> Use GLMdenoise
+% wantfracridge = 1  -> Use ridge regression to improve beta estimates
+% chunknum = 5000 -> is the number of voxels that we will process at the
+% same time. For setups with lower memory deacrease this number.
+
+% wantmemoryoutputs is a logical vector [A B C D] indicating which of the
+%     four model types to return in the output <results>. The user must be careful with this,
+%     as large datasets can require a lot of RAM. If you do not request the various model types,
+%     they will be cleared from memory (but still potentially saved to disk).
+%     Default: [0 0 0 1] which means return only the final type-D model.
+
+% wantfileoutputs is a logical vector [A B C D] indicating which of the
+%     four model types to save to disk (assuming that they are computed).
+%     A = 0/1 for saving the results of the ONOFF model
+%     B = 0/1 for saving the results of the FITHRF model
+%     C = 0/1 for saving the results of the FITHRF_GLMDENOISE model
+%     D = 0/1 for saving the results of the FITHRF_GLMDENOISE_RR model
+%     Default: [1 1 1 1] which means save all computed results to disk.
+
+
+[results] = GLMestimatesingletrial(design,data,stimdur,tr,dataset);
+%% Important outputs
+% <R2> is model accuracy expressed in terms of R^2 (percentage).
+% <modelmd> is the full set of single-trial beta weights (X x Y x Z x TRIALS)
+% <HRFindex> is the 1-index of the best HRF, can be retried with
+% getcanonicalhrflibrary(stimdur,tr)
+% <FRACvalue> is the fractional ridge regression regularization level chosen for each voxel
+
+
+%% Plot 1 slice of brain data
+slice = 20; % adjust this number when using different datasets
+val2plot = {'meanvol';'R2';'HRFindex';'FRACvalue'};
+cmaps = {gray;hot;parula;copper};
+figure(3);clf
+
+for v = 1 : length(val2plot)
+    
+    f=subplot(2,2,v);
+    imagesc(results{4}.(val2plot{v})(:,:,slice)); axis off image;
+    colormap(f,cmaps{v}) % Error message is related to this line
+    colorbar
+    title(val2plot{v})
+    set(gca,'FontSize',20)
+    
+end
+
+set(gcf,'Position',[1224 840 758 408])
+
+%% Plot single beta weights for one voxel for all conditions
+betas = results{4}.modelmd;
+% locate beta weights for the same condition in beta output. 
+newdesign = design;    
+for r = 1 : length(design)
+    
+    dm = full(design{r});
+    newdm = zeros(size(dm));
+    for cond = 1 : size(dm,2)
+        
+        tmp = dm(:,cond) == 1;
+        newdm(tmp,cond) = cond;
+        newdesign{r} = newdm;
+    end
+end
+ 
+indx_of_beta=cell2mat(cellfun(@flatten,newdesign,'UniformOutput',false));
+indx_of_beta(indx_of_beta==0) = [];
+% index_of_beta should correspond to the 4th dimension of betas
+[maxval,ind] = max(results{4}.R2(:));
+[x,y,z] = ind2sub(size(results{4}.R2),ind);
+
+figure(4);clf
+for i = unique(indx_of_beta)
+    
+    beta_ind = indx_of_beta == i;    
+    plot(ones(sum(beta_ind),1)*i,squeeze(betas(x,y,z,beta_ind)),'.','MarkerSize',10); hold on
+    bar(i,nanmedian(squeeze(betas(x,y,z,beta_ind))),'FaceColor','None');
+    
+end
+
+xticks(1:length(unique(indx_of_beta)))
+
+ylabel('Single trial beta weight')
+xlabel('Conditions')
+title('Single beta weights for each condition for voxel with highest R2')
+set(gca,'Fontsize',15)
+##### SOURCE END #####
+--></body></html>
