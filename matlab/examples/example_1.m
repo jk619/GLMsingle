@@ -1,37 +1,39 @@
 
 %% addpath to GLMsingle and fracridge
-addpath(genpath('/Users/jankurzawski/Documents/GLMsingle'))
+addpath(genpath('./../'))
 addpath(genpath('/Users/jankurzawski/Documents/fracridge'))
 
 clear
 
 if ~exist('./data','dir')
     mkdir('data')
-    % Download data for an example subject
     
-    !curl -L --output ./data/nsdflocexampledataset.mat https://osf.io/8rmjk/
-    !curl -L --output ./data/haxby.mat https://osf.io/f6vpq/download
-    !curl -L --output ./data/nsdcoreexampledataset.mat https://osf.io/jqpwz/download
 end
 
-datasets = {'nsdcore';'nsdfloc';'haxby'};
-dataset = datasets{1};
+% Pick dataset
 
+datasets = {'nsdcore';'nsdfloc';'haxby'};
+dataset = datasets{2};
+
+% Download data for an example subject
 
 switch dataset
     
     case 'nsdfloc'
+        !curl -L --output ./data/nsdflocexampledataset.mat https://osf.io/8rmjk/download
         load('./data/nsdflocexampledataset.mat')
     case 'nsdcore'
+        !curl -L --output ./data/nsdcoreexampledataset.mat https://osf.io/jqpwz/download
         load('./data/nsdcoreexampledataset.mat')
     case 'haxby'
+        !curl -L --output ./data/haxby.mat https://osf.io/f6vpq/download
         load('./data/haxby.mat')
 end
 
 %%
 clc
 whos
-% data -> Consists of several runs of 4D volume files (x y z t)  where 
+% data -> Consists of several runs of 4D volume files (x y z t)  where
 % (t)ime is the 4th dimention
 
 % design -> Each run has a corresponding design matrix where each colum
@@ -97,7 +99,7 @@ title('fMRI data (first volume)');
 %     Default: [1 1 1 1] which means save all computed results to disk.
 
 
-[results] = GLMestimatesingletrial(design,data,stimdur,tr,'example1figures');
+[results] = GLMestimatesingletrial(design,data,stimdur,tr,dataset);
 %% Important outputs
 % <R2> is model accuracy expressed in terms of R^2 (percentage).
 % <modelmd> is the full set of single-trial beta weights (X x Y x Z x TRIALS)
