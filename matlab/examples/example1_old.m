@@ -61,7 +61,7 @@ title('Design matrix for run4')
 
 load('./rois/lh_rois.mat');
 V1_lh_ind = (lh_rois == 1 | lh_rois == 2); % dorsalV1 = 1 and ventralV1 = 2;
-
+V1_lh_ind = isfinite(lh_rois);
 % create superficial dataset
 superficial_data = cell(1,length(numrun)/2);
 superficial_design = cell(1,length(numrun)/2);
