@@ -31,8 +31,8 @@ end
 %%
 clc
 whos
-% data -> Consists of several runs of 4D volume files where time is the 4th
-% dimentions
+% data -> Consists of several runs of 4D volume files (x y z t)  where 
+% (t)ime is the 4th dimention
 
 % design -> Each run has a corresponding design matrix where each colum
 % describes single condition (conditions are repeated across runs). Each
