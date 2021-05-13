@@ -1,4 +1,4 @@
-
+%% Add dependencies and download the data
 % addpath to GLMsingle and fracridge
 addpath(genpath('./../'))
 addpath(genpath('/Users/jk7127/Documents/fracridge'))
@@ -10,7 +10,7 @@ clear
 datasets = {'nsdcore';'nsdfloc';'haxby'};
 dataset = datasets{2};
 
-% Download data for an example subject
+% Download data to data directory
 
 if ~exist('./data','dir')
     mkdir('data')
@@ -83,11 +83,12 @@ title('fMRI data (first volume)');
 % current directory or saved to the results variable which is the only
 % output of GLMestimatesingletrial
 
-% default options (all parameters below can be assigned to a variable i.e
-% opt by creating fields (opt.wantlibrary). Options are the 6th input to
-% GLMestimatesingletrial.
+% Optional parameters below can be assigned to a variable i.e
+% opt by creating fields (i.e opt.wantlibrary). Options are the 6th input 
+% to GLMestimatesingletrial.
 
-% DEFAULT OPTIONS
+% DEFAULT OPTIONS:
+
 % wantlibrary = 1 -> Fit hRF to each voxel
 % wantglmdenoise = 1 -> Use GLMdenoise
 % wantfracridge = 1  -> Use ridge regression to improve beta estimates
@@ -117,6 +118,8 @@ title('fMRI data (first volume)');
 % getcanonicalhrflibrary(stimdur,tr)
 % <FRACvalue> is the fractional ridge regression regularization level chosen for each voxel
 
+
+%% Plot 1 slice of brain data
 slice = 20; % adjust this number when using different datasets
 val2plot = {'meanvol';'R2';'HRFindex';'FRACvalue'};
 cmaps = {gray;hot;parula;copper};
@@ -160,10 +163,10 @@ indx_of_beta(indx_of_beta==0) = [];
 figure(4);clf
 for i = unique(indx_of_beta)
     
-    beta_ind = indx_of_beta == i;
-    
+    beta_ind = indx_of_beta == i;    
     plot(ones(sum(beta_ind),1)*i,squeeze(betas(x,y,z,beta_ind)),'.','MarkerSize',10); hold on
     bar(i,nanmedian(squeeze(betas(x,y,z,beta_ind))),'FaceColor','None');
+    
 end
 
 xticks(1:length(unique(indx_of_beta)))
